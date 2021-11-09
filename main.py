@@ -1,8 +1,11 @@
 #Python
 from typing import Optional
+from enum import Enum # Crear enumeraciones
 
 #Pydantic
 from pydantic import BaseModel
+from pydantic import Field, EmailStr
+
 
 #FastAPI
 from fastapi import FastAPI
@@ -13,19 +16,45 @@ app = FastAPI()
 
 # Models
 
+class HairColor(Enum):
+	white = "white"
+	brown = "brown"
+	black = "Black"
+	yellow = "Yellow"
+	red= "Red"
+
 class Location(BaseModel):
 	city: str
 	state: str
 	country: str
 
+
 class Person(BaseModel):
-	frist_name: str
+	frist_name: str = Field(
+		..., 
+		min_length=1,
+		max_length=50
+		)
 	last_name: str
-	age: int 
-	hair_color: Optional[str] = None
-	is_married: Optional[bool] = None
+	age: int = Field(
+		...,
+		gt=0,
+		le=115
+		)
+	hair_color: Optional[HairColor] = Field(default=None)
+	is_married: Optional[bool] = Field(default=None)
+	email: str = EmailStr()
 
-
+	class Config:
+		schema_extra = {
+			"example": {
+				"frist_name": "Facundo",
+				"last_name": "Garcia Martoni",
+				"age": 21,
+				"hair_color": "blonde",
+				"is_married": False
+			}
+		}
 
 
 
@@ -46,13 +75,14 @@ def create_person(person: Person = Body(...)):
 
 @app.get("/person/detail")
 def show_person(
-	name: Optional[str] = Query(None, min_length=1, max_length=50),
+	name: Optional[str] = Query(None, min_length=1, max_length=50, example="Rocio"),
 	title="Person Name", 
 	description="This is the person name. It's between 1 and 50 characters", 
 	age: str = Query(
 		...,
 		title="Person Age",
-		description="This is the person age. It's required"
+		description="This is the person age. It's required",
+		example=25
 		)
 ):
 	return {name: age}
@@ -66,7 +96,8 @@ def show_person(
 		..., 
 		gt=0,
 		title="Id Person",
-		description="This is the id of the person"
+		description="This is the id of the person",
+		example=123
 		)
 ):
 	return {person_id: "It exists:!"}
@@ -80,7 +111,8 @@ def update_person(
 		...,
 		title="Person Id",
 		description="This is the person ID",
-		gt=0
+		gt=0,
+		example=1
 	),
 	person: Person = Body(...),
 	location: Location = Body(...)
