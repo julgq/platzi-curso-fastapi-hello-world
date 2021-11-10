@@ -44,6 +44,7 @@ class Person(BaseModel):
 	hair_color: Optional[HairColor] = Field(default=None)
 	is_married: Optional[bool] = Field(default=None)
 	email: str = EmailStr()
+	password: str = Field(..., min_length=8)
 
 	class Config:
 		schema_extra = {
@@ -57,7 +58,6 @@ class Person(BaseModel):
 		}
 
 
-
 @app.get("/")
 def home():
 	return {"Hello": "World"}
@@ -67,7 +67,7 @@ def home():
 
 # ... el parametro es obligatorio.
 # recibe un person donde se define que es Body request entendido por FastAPI
-@app.post("/person/new")
+@app.post("/person/new", response_model=Person, response_model_exclude={'password'})
 def create_person(person: Person = Body(...)):
 	return person
 
