@@ -9,7 +9,9 @@ from pydantic import Field, EmailStr
 
 #FastAPI
 from fastapi import FastAPI
+from fastapi import status
 from fastapi import Body, Query, Path
+
 
 app = FastAPI()
 
@@ -29,7 +31,7 @@ class Location(BaseModel):
 	country: str
 
 
-class Person(BaseModel):
+class PersonBase(BaseModel):
 	frist_name: str = Field(
 		..., 
 		min_length=1,
@@ -44,7 +46,7 @@ class Person(BaseModel):
 	hair_color: Optional[HairColor] = Field(default=None)
 	is_married: Optional[bool] = Field(default=None)
 	email: str = EmailStr()
-	password: str = Field(..., min_length=8)
+	
 
 	class Config:
 		schema_extra = {
@@ -58,41 +60,29 @@ class Person(BaseModel):
 			}
 		}
 
-class PersonOut(BaseModel):
-	frist_name: str = Field(
-		..., 
-		min_length=1,
-		max_length=50
-		)
-	last_name: str
-	age: int = Field(
-		...,
-		gt=0,
-		le=115
-		)
-	hair_color: Optional[HairColor] = Field(default=None)
-	is_married: Optional[bool] = Field(default=None)
-	email: str = EmailStr()
+class Person(PersonBase):
+	password: str = Field(..., min_length=8)
+
+class PersonOut(PersonBase):
+	pass
 
 
-@app.get("/")
+@app.get("/", status_code=status.HTTP_200_OK)
 def home():
 	return {"Hello": "World"}
 
 # Request and Response Body
-
-
 # ... el parametro es obligatorio.
 # recibe un person donde se define que es Body request entendido por FastAPI
 # solo devolver PersonOut para evitar regresar a la contraseña.
 #@app.post("/person/new",response_model=Person,response_model_exclude={'password'})
-@app.post("/person/new",response_model=PersonOut)
+@app.post("/person/new",response_model=PersonOut, status_code=status.HTTP_201_CREATED)
 def create_person(person: Person = Body(...)):
 	return person
 
 # Validaciones: Query Parameters
 
-@app.get("/person/detail")
+@app.get("/person/detail", status_code=status.HTTP_200_OK)
 def show_person(
 	name: Optional[str] = Query(None, min_length=1, max_length=50, example="Rocio"),
 	title="Person Name", 
