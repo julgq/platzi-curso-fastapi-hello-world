@@ -53,9 +53,26 @@ class Person(BaseModel):
 				"last_name": "Garcia Martoni",
 				"age": 21,
 				"hair_color": "blonde",
-				"is_married": False
+				"is_married": False,
+				"password":"hola"
 			}
 		}
+
+class PersonOut(BaseModel):
+	frist_name: str = Field(
+		..., 
+		min_length=1,
+		max_length=50
+		)
+	last_name: str
+	age: int = Field(
+		...,
+		gt=0,
+		le=115
+		)
+	hair_color: Optional[HairColor] = Field(default=None)
+	is_married: Optional[bool] = Field(default=None)
+	email: str = EmailStr()
 
 
 @app.get("/")
@@ -67,7 +84,9 @@ def home():
 
 # ... el parametro es obligatorio.
 # recibe un person donde se define que es Body request entendido por FastAPI
-@app.post("/person/new", response_model=Person, response_model_exclude={'password'})
+# solo devolver PersonOut para evitar regresar a la contraseña.
+#@app.post("/person/new",response_model=Person,response_model_exclude={'password'})
+@app.post("/person/new",response_model=PersonOut)
 def create_person(person: Person = Body(...)):
 	return person
 
