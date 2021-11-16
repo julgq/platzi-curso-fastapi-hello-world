@@ -10,7 +10,7 @@ from pydantic import Field, EmailStr
 #FastAPI
 from fastapi import FastAPI
 from fastapi import status
-from fastapi import Body, Query, Path, Form
+from fastapi import Body, Query, Path, Form, Header, Cookie
 
 
 app = FastAPI()
@@ -138,3 +138,26 @@ def update_person(
 @app.post("/login", response_model=LoginOut, status_code=status.HTTP_200_OK)
 def login(username: str = Form(...), password: str = Form(...)):
 	return LoginOut(username=username)
+
+
+# Cookies and Headers Parameters
+@app.post("/contact", status_code=status.HTTP_200_OK)
+def contact(
+	frist_name: str = Form(
+		..., 
+		max_length=20, 
+		min_length=1), 
+	last_name: str = Form(
+		..., 
+		max_length=20, 
+		min_length=1), 
+	email: EmailStr = Form(...),
+	message: str = Form(
+		...,
+		min_length=20
+		),
+	user_agent: Optional[str] = Header(default=None),
+	ads: Optional[str] = Cookie(default=None)
+
+	):
+		return user_agent
