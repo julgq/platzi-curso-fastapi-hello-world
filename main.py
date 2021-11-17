@@ -80,13 +80,13 @@ def home():
 # recibe un person donde se define que es Body request entendido por FastAPI
 # solo devolver PersonOut para evitar regresar a la contraseña.
 #@app.post("/person/new",response_model=Person,response_model_exclude={'password'})
-@app.post("/person/new",response_model=PersonOut, status_code=status.HTTP_201_CREATED)
+@app.post("/person/new",response_model=PersonOut, status_code=status.HTTP_201_CREATED, tags=['Persons'])
 def create_person(person: Person = Body(...)):
 	return person
 
 # Validaciones: Query Parameters
 
-@app.get("/person/detail", status_code=status.HTTP_200_OK)
+@app.get("/person/detail", status_code=status.HTTP_200_OK, tags=['Persons'])
 def show_person(
 	name: Optional[str] = Query(None, min_length=1, max_length=50, example="Rocio"),
 	title="Person Name", 
@@ -96,6 +96,7 @@ def show_person(
 		title="Person Age",
 		description="This is the person age. It's required",
 		example=25
+
 		)
 ):
 	return {name: age}
@@ -104,7 +105,7 @@ def show_person(
 # Validacfiones: Path Parameters
 persons = [1, 2, 3, 4, 5]
 
-@app.get("/person/detail/{person_id}")
+@app.get("/person/detail/{person_id}", tags=['Persons'])
 def show_person(
 	person_id: int = Path(
 		..., 
@@ -124,7 +125,7 @@ def show_person(
 
 # Validaciones: Request body
 
-@app.put("/person/{person_id}")
+@app.put("/person/{person_id}", tags=['Persons'])
 def update_person(
 	person_id: int = Path(
 		...,
@@ -142,7 +143,7 @@ def update_person(
 	return results
 
 
-@app.post("/login", response_model=LoginOut, status_code=status.HTTP_200_OK)
+@app.post("/login", response_model=LoginOut, status_code=status.HTTP_200_OK, tags=['Persons'])
 def login(username: str = Form(...), password: str = Form(...)):
 	return LoginOut(username=username)
 
