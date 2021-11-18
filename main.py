@@ -80,8 +80,21 @@ def home():
 # recibe un person donde se define que es Body request entendido por FastAPI
 # solo devolver PersonOut para evitar regresar a la contraseña.
 #@app.post("/person/new",response_model=Person,response_model_exclude={'password'})
-@app.post("/person/new",response_model=PersonOut, status_code=status.HTTP_201_CREATED, tags=['Persons'])
+@app.post("/person/new",response_model=PersonOut, status_code=status.HTTP_201_CREATED, tags=['Persons'], summary="Crear person in the app")
 def create_person(person: Person = Body(...)):
+	"""
+	Create Person
+
+	This path operation creates a person in the app and save information in database.
+	
+	Parameters:
+	- Request body parameter:
+		- **person: Person** -> A person model with frist name, last name, age, hair color and marital status
+
+	Returns a person model with first name, last name, age, hair color and marital status
+
+
+	"""
 	return person
 
 # Validaciones: Query Parameters
